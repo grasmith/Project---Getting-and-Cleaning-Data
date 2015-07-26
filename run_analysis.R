@@ -7,21 +7,30 @@ train_dir <- paste(top_dir,"train",sep="/")
 setwd(home_dir)
 # load the lookup table that will be used to convert variable names
 lkup <- read.table("lbls_lkup.txt",stringsAsFactors = FALSE,col.names=c("old","new"))
-# load the 'feature' which are the raw variable names for the dataset, e.g. tBodyAcc-mean()-X
 setwd(top_dir)
+# load the 'features' which are the raw variable names for the dataset, e.g. tBodyAcc-mean()-X
 features <- read.table("features.txt",stringsAsFactors = FALSE,col.names=c("index","feature"))
+# load the names of the activities
 act_labels <- read.table("activity_labels.txt",stringsAsFactors = FALSE,col.names=c("index","activity"))
 
+#start with the test data: first load the subjects (people that were doing the activities)
+#and activities (what they did)
 setwd(test_dir)
 subjects <- read.table("subject_test.txt",stringsAsFactors = FALSE,col.names="subject")
 activities <- read.table("y_test.txt",stringsAsFactors = FALSE,col.names="activity")
+#now load the observations
 tst_body <- tbl_df(read.table("X_test.txt",stringsAsFactors = FALSE,col.names = features$feature))
+#only interested in means and std deviations
 tst_body <- select(tst_body,contains(".mean."),contains(".std."))
+#give the variables more meaningful names from the lookup file loaded earlier
 names(tst_body) <- lkup$new
+#add columns for the activities and subjects
 tst_body <- mutate(tst_body,activity=activities$activity)
 tst_body <- mutate(tst_body,subject = subjects$subject)
+#reorder
 tst_body <- tst_body[,c(67,68,1:66)]
 
+#exact same steps as above for train dataset
 setwd(train_dir)
 subjects <- read.table("subject_train.txt",stringsAsFactors = FALSE,col.names="subject")
 activities <- read.table("y_train.txt",stringsAsFactors = FALSE,col.names="activity")
