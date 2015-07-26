@@ -41,20 +41,22 @@ trn_body <- mutate(trn_body,activity=activities$activity)
 trn_body <- mutate(trn_body,subject = subjects$subject)
 trn_body <- trn_body[,c(67,68,1:66)]
 
+#merge the two datasets
 two_body <- rbind(trn_body,tst_body,make.row.names = FALSE)
 rm(trn_body,tst_body)
 
+#replace the activity numbers by the activity names
 act_index <- two_body$activity
 for(i in 1:10299){two_body$activity[i] <- act_labels$activity[act_index[i]]}
 
-#From the data set in step 4,
-#creates a second, independent tidy data set
+#From the mergeed data set
+#create a second, independent tidy data set
 #with the average of each variable for each activity and each subject.
 
 tidy_ds <- group_by(two_body,activity,subject)
-
 sum_tidy_ds <- summarise_each(tidy_ds, funs(mean))
 
+#now write the tidy dataset to a text file for upload
 setwd(home_dir)
 write.table(sum_tidy_ds,file="final_ds.txt",row.names=FALSE)
 
